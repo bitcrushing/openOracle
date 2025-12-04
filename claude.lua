@@ -1,4 +1,3 @@
-#!/usr/bin/env lua
 -- Claude Code for OpenComputers
 -- A conversational AI assistant for Minecraft computers
 --
@@ -26,6 +25,23 @@ local conversation = {
   messages = {},
   history = {} -- Input history for readline
 }
+
+-- Modules to unload on exit (to free memory)
+local modulesToUnload = {"config", "claude_api", "ui", "json"}
+
+-- Cleanup function to free memory
+local function cleanup()
+  -- Clear conversation data
+  conversation.messages = nil
+  conversation.history = nil
+  conversation = nil
+
+  -- Unload custom modules from package.loaded cache
+  for _, modName in ipairs(modulesToUnload) do
+    package.loaded[modName] = nil
+  end
+
+end
 
 -- Handle command line arguments
 local function handleArgs()
@@ -277,6 +293,9 @@ local function main()
       ui.printError(err)
     end
   end
+
+  -- Clean up memory before exit
+  cleanup()
 end
 
 main()
