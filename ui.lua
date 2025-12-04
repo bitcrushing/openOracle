@@ -156,7 +156,7 @@ end
 -- Read user input with history support
 function ui.readInput(history)
   history = history or {}
-  local input = term.read(history, false, nil, "*")
+  local input = term.read(history, false, nil, nil)
   if input then
     input = input:gsub("%s+$", "") -- Trim trailing whitespace/newline
   end
