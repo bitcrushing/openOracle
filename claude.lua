@@ -1,4 +1,3 @@
-#!/usr/bin/env lua
 -- Claude Code for OpenComputers
 -- A conversational AI assistant for Minecraft computers
 --
@@ -42,9 +41,11 @@ local function cleanup()
     package.loaded[modName] = nil
   end
 
-  -- Force garbage collection
-  collectgarbage("collect")
-  collectgarbage("collect")
+  -- Trigger garbage collection via os.sleep loop (OpenComputers workaround)
+  -- GC runs when computer is resumed, os.sleep(0) triggers resume cycles
+  for _ = 1, 10 do
+    os.sleep(0)
+  end
 end
 
 -- Handle command line arguments
