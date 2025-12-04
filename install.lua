@@ -9,7 +9,7 @@ local BIN_DIR = "/usr/bin"
 
 local files = {
   lib = {"json.lua", "config.lua", "claude_api.lua", "ui.lua"},
-  bin = {"claude.lua"}
+  bin = {"claude.lua", "update.lua"}
 }
 
 print("=== Claude Code Installer ===")
@@ -83,5 +83,8 @@ print("")
 print("Next steps:")
 print("  1. Run 'claude --setup' to configure your API key")
 print("  2. Run 'claude' to start chatting!")
+print("")
+print("To update later:")
+print("  Edit BASE_URL in /usr/bin/update, then run 'update'")
 print("")
 print("Note: You need an Internet Card installed in your computer.")
