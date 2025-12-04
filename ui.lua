@@ -146,11 +146,63 @@ function ui.wordWrap(text, maxWidth)
   return table.concat(lines, "\n")
 end
 
--- Print response with word wrapping
+-- Print response with word wrapping and pagination for long messages
 function ui.printResponse(text)
-  local width = ui.getSize()
+  local width, height = ui.getSize()
   local wrapped = ui.wordWrap(text, width - 2)
-  print(wrapped)
+
+  -- Split into lines
+  local lines = {}
+  for line in wrapped:gmatch("([^\n]*)\n?") do
+    table.insert(lines, line)
+  end
+
+  -- Remove trailing empty line from pattern match
+  if lines[#lines] == "" then
+    table.remove(lines)
+  end
+
+  -- Calculate usable height (reserve 2 lines for prompt)
+  local pageSize = height - 4
+
+  -- If fits on screen, just print
+  if #lines <= pageSize then
+    print(wrapped)
+    return
+  end
+
+  -- Paginate long responses
+  local currentLine = 1
+  while currentLine <= #lines do
+    -- Print one page
+    local endLine = math.min(currentLine + pageSize - 1, #lines)
+    for i = currentLine, endLine do
+      print(lines[i])
+    end
+
+    currentLine = endLine + 1
+
+    -- If more content, show prompt
+    if currentLine <= #lines then
+      local remaining = #lines - currentLine + 1
+      ui.setColors(ui.colors.yellow)
+      io.write("-- More (" .. remaining .. " lines) [Enter=next, q=quit] --")
+      ui.resetColors()
+
+      -- Wait for keypress
+      local _, _, char = event.pull("key_down")
+      -- Clear the prompt line
+      io.write("\r" .. string.rep(" ", width) .. "\r")
+
+      -- Check for quit
+      if char == 113 or char == 81 then -- 'q' or 'Q'
+        ui.setColors(ui.colors.gray)
+        print("(Response truncated)")
+        ui.resetColors()
+        break
+      end
+    end
+  end
 end
 
 -- Read user input with history support
@@ -212,10 +264,12 @@ function ui.printHelp()
   print("  /exit     - Exit Claude Code")
   print("  /save     - Save conversation to file")
   print("  /load     - Load conversation from file")
+  print("  /last     - Re-display last response")
   print("")
   ui.printColored("Tips:", ui.colors.cyan)
   print("  - Press Ctrl+C to interrupt")
   print("  - Use arrow keys for input history")
+  print("  - Long responses are paginated (q to skip)")
   print("")
 end
 

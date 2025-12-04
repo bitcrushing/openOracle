@@ -153,6 +153,19 @@ local function processCommand(input)
     end
     return true
 
+  elseif cmd == "last" then
+    -- Re-display the last Claude response
+    for i = #conversation.messages, 1, -1 do
+      if conversation.messages[i].role == "assistant" then
+        ui.printResponseLabel()
+        ui.printResponse(conversation.messages[i].content)
+        print("")
+        return true
+      end
+    end
+    ui.printInfo("No previous response to display.")
+    return true
+
   else
     ui.printError("Unknown command: /" .. tostring(cmd))
     ui.printInfo("Type /help for available commands.")
