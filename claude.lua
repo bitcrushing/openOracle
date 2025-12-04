@@ -1,4 +1,3 @@
-#!/usr/bin/env lua
 -- Claude Code for OpenComputers
 -- A conversational AI assistant for Minecraft computers
 --
