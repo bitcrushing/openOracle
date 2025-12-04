@@ -27,6 +27,28 @@ local conversation = {
   history = {} -- Input history for readline
 }
 
+-- Modules to unload on exit (to free memory)
+local modulesToUnload = {"config", "claude_api", "ui", "json"}
+
+-- Cleanup function to free memory
+local function cleanup()
+  -- Clear conversation data
+  conversation.messages = nil
+  conversation.history = nil
+  conversation = nil
+
+  -- Unload custom modules from package.loaded cache
+  for _, modName in ipairs(modulesToUnload) do
+    package.loaded[modName] = nil
+  end
+
+  -- Trigger garbage collection via os.sleep loop (OpenComputers workaround)
+  -- GC runs when computer is resumed, os.sleep(0) triggers resume cycles
+  for _ = 1, 10 do
+    os.sleep(0)
+  end
+end
+
 -- Handle command line arguments
 local function handleArgs()
   if #args == 0 then
@@ -277,6 +299,9 @@ local function main()
       ui.printError(err)
     end
   end
+
+  -- Clean up memory before exit
+  cleanup()
 end
 
 main()
